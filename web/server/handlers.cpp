@@ -1,4 +1,5 @@
 #include "handlers.h"
+#include "name_filter.h"
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
 #include <nlohmann/json.hpp>
@@ -123,6 +124,9 @@ HttpResponse Router::handleRegister(const HttpRequest& req, MySQLConn* db) {
         auto j=json::parse(req.body);
         std::string u=j.at("username"), p=j.at("password");
         if(u.length()<2||u.length()>32)return HttpResponse::badRequest().json("{\"error\":\"username 2-32 chars\"}");
+        std::string filterReason;
+        if(!NameFilter::instance().check(u, filterReason))
+            return HttpResponse::badRequest().json(("{\"error\":\""+filterReason+"\"}").c_str());
         auto rows=db->query("SELECT id FROM users WHERE username='%s'",db->escape(u).c_str());
         if(!rows.empty())return HttpResponse().status(409,"Conflict").json("{\"error\":\"username taken\"}");
         uint8_t h[SHA256_DIGEST_LENGTH]; SHA256((const uint8_t*)p.c_str(),p.length(),h);
