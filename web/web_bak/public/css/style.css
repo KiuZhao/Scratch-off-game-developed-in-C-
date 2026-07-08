@@ -1,0 +1,115 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; }
+body { background:#1E1432; color:#fff; font-family:'Microsoft YaHei',sans-serif;
+       display:flex; justify-content:center; }
+#app { width:100%; max-width:1280px; height:100vh; position:relative;
+       display:flex; flex-direction:column; }
+
+/* 防闪烁 */
+[v-cloak] { display:none !important; }
+
+/* ── 加载中 ── */
+.loading { display:flex; align-items:center; justify-content:center;
+           width:100%; height:100%; color:#FFD700; font-size:24px; }
+
+/* ── 顶栏 ── */
+.topbar { display:flex; align-items:center; padding:8px 16px; height:60px;
+          gap:12px; flex-shrink:0; }
+.btn-cheat { padding:6px 16px; background:#4682D2; color:#fff; border:none;
+             border-radius:4px; cursor:pointer; font-size:14px; }
+.btn-cheat:disabled { opacity:0.5; cursor:default; }
+.btn-logout { padding:6px 12px; background:#B44; color:#fff; border:none;
+              border-radius:4px; cursor:pointer; font-size:13px; margin-left:auto; }
+
+.souvenirs { display:flex; align-items:center; gap:6px; flex:1; }
+.souv-item { display:flex; flex-direction:column; align-items:center; }
+.souv-icon { width:32px; height:32px; border-radius:4px; }
+.souv-count { font-size:11px; color:#ccc; }
+.balance { margin-left:20px; color:#FFD700; font-size:14px; font-weight:bold; }
+.profit { color:#FFD700; font-size:13px; white-space:nowrap; }
+
+/* ── 主区域 ── */
+.main-area { display:flex; flex-direction:column; flex:1; padding-top:20px; min-height:0; }
+.cards-row { display:flex; justify-content:center; gap:40px; flex:1; padding-top:30px; }
+.card { width:200px; height:380px; background:#32284A; border-radius:8px; border:2px solid #555;
+        cursor:pointer; text-align:center; transition:all .2s; display:flex;
+        flex-direction:column; align-items:center; flex-shrink:0; }
+.card:hover { border-color:#FFD700; background:#3D3260; }
+.card.selected { border-color:#FFB832; border-width:3px; box-shadow:0 0 15px rgba(255,184,50,.5); }
+.card-img { width:150px; height:150px; border-radius:8px; margin:20px 0 10px;
+            display:flex; align-items:center; justify-content:center; }
+.card-name { color:#FFD700; font-size:20px; font-weight:bold; }
+.card-desc { color:#fff; font-size:15px; margin:4px 0; }
+.card-chance { color:#ccc; font-size:13px; margin-bottom:10px; }
+.card-price { width:100%; padding:10px; background:#161028; border-radius:0 0 6px 6px;
+              display:flex; align-items:center; justify-content:center; gap:8px; margin-top:auto; }
+.coin { font-size:24px; }
+.price-num { color:#FFD700; font-size:20px; font-weight:bold; }
+
+/* ── 底部栏 ── */
+.bottombar { display:flex; align-items:center; justify-content:space-between;
+             padding:12px 20px; height:55px; flex-shrink:0; }
+.tip { color:#aaa; font-size:13px; }
+.btns-right { display:flex; gap:10px; }
+.btn { padding:8px 20px; background:#4682D2; color:#fff; border:none; border-radius:4px;
+       cursor:pointer; font-size:14px; }
+.btn:hover { background:#5698F0; }
+.btn:disabled { opacity:0.4; cursor:default; }
+.btn.primary { background:#3A8; }
+.btn.primary:hover { background:#4BA; }
+
+/* ── 弹窗 ── */
+.overlay { position:fixed; top:0; left:0; width:100vw; height:100vh;
+           background:rgba(0,0,0,.7); display:flex; align-items:center;
+           justify-content:center; z-index:100; }
+.modal { background:#2A2048; padding:30px 40px; border-radius:12px; border:2px solid #FFD700;
+         text-align:center; min-width:380px; max-height:80vh; overflow-y:auto; }
+.modal.wide { min-width:500px; }
+.modal h2 { color:#FFD700; margin-bottom:15px; }
+.modal input { display:block; width:100%; padding:10px; margin:8px 0; border:1px solid #555;
+               border-radius:4px; background:#1E1432; color:#fff; font-size:15px; }
+.modal-btns { margin-top:15px; display:flex; gap:15px; align-items:center; justify-content:center; }
+.modal-btns a { color:#aaa; font-size:13px; cursor:pointer; }
+.error { color:#F55; margin-top:10px; font-size:13px; }
+
+/* ── 排行榜 ── */
+.tabs { display:flex; gap:8px; margin-bottom:12px; justify-content:center; }
+.tabs button { padding:6px 16px; background:#3A3070; color:#fff; border:none;
+               border-radius:4px; cursor:pointer; }
+.tabs button.active { background:#4682D2; }
+.rank-list { max-height:350px; overflow-y:auto; }
+.rank-row { display:flex; align-items:center; padding:6px 8px; border-bottom:1px solid #3A3070; }
+.rank-num { width:40px; color:#FFD700; font-weight:bold; }
+.rank-name { flex:1; text-align:left; }
+.rank-val { color:#4F8; }
+.rank-val.loss { color:#F55; }
+
+/* ── 刮奖页 ── */
+.scratch-area { display:flex; flex-direction:column; flex:1; padding:10px 0; min-height:0; }
+.scratch-title { text-align:center; color:#FFD700; margin:8px 0; }
+.grid-wrapper { position:relative; margin:auto; }
+.grid { display:grid; grid-template-columns:repeat(5, 150px); gap:10px;
+        justify-content:center; }
+.cell { width:150px; height:100px; position:relative; border:1px solid #555; }
+.cell-top { height:50px; display:flex; align-items:center; justify-content:center;
+            font-size:14px; font-weight:bold; }
+.cell.win .cell-top { color:#B00; }
+.cell-bot { height:50px; background:#281E64; display:flex; align-items:center;
+            justify-content:center; color:#FFD700; font-size:14px; font-weight:bold; }
+.cell-coating { position:absolute; top:0; left:0; width:150px; height:100px; cursor:pointer; }
+
+/* ── 结果弹窗 ── */
+.souv-big { width:100px; height:100px; margin:10px auto; border-radius:8px;
+            display:flex; align-items:center; justify-content:center;
+            color:#FFD700; font-size:14px; border:2px solid #fff; }
+.prize-text { color:#FFD700; font-size:20px; margin:10px 0; font-weight:bold; }
+
+/* ── Toast ── */
+.toast { position:fixed; bottom:50px; left:50%; transform:translateX(-50%);
+         background:#333; color:#fff; padding:10px 30px; border-radius:6px;
+         font-size:15px; z-index:200; animation:fadeout 2s forwards; }
+@keyframes fadeout { 0%,60% { opacity:1; } 100% { opacity:0; } }
+
+/* ── 作弊弹窗 ── */
+.cheat-text { color:#fff; font-size:16px; margin:10px 0; line-height:1.6; }
+.cheat-amt  { color:#FFD700; font-size:20px; font-weight:bold; margin:10px 0; }

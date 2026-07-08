@@ -1,0 +1,26 @@
+# 编译产物
+*.exe
+*.o
+*.obj
+*.out
+*.so
+*.a
+
+# 存档文件
+*.dat
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 构建目录
+build/
+cmake-build-*/
+
+# 临时文件
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
