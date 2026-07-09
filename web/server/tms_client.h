@@ -48,15 +48,21 @@ static std::string sha256Hex(const std::string& data) {
     return oss.str();
 }
 
-// HMAC-SHA256 十六进制
-static std::string hmacSha256Hex(const std::string& key, const std::string& msg) {
+// HMAC-SHA256 二进制 (中间步骤用)
+static std::string hmacSha256Bin(const std::string& key, const std::string& msg) {
     uint8_t result[EVP_MAX_MD_SIZE];
     unsigned int len = 0;
     HMAC(EVP_sha256(), key.c_str(), (int)key.length(),
          (const uint8_t*)msg.c_str(), msg.length(), result, &len);
+    return std::string((char*)result, len);
+}
+
+// HMAC-SHA256 十六进制 (最终签名用)
+static std::string hmacSha256Hex(const std::string& key, const std::string& msg) {
+    auto bin = hmacSha256Bin(key, msg);
     std::ostringstream oss;
-    for (unsigned int i = 0; i < len; ++i)
-        oss << std::hex << std::setfill('0') << std::setw(2) << (int)result[i];
+    for (unsigned char c : bin)
+        oss << std::hex << std::setfill('0') << std::setw(2) << (int)(uint8_t)c;
     return oss.str();
 }
 
@@ -95,6 +101,8 @@ static std::string httpsPost(const std::string& host, const std::string& path,
         << "Host: " << host << "\r\n"
         << "Content-Type: application/json\r\n"
         << "X-TC-Action: " << action << "\r\n"
+        << "X-TC-Version: 2020-12-29\r\n"
+        << "X-TC-Region: ap-guangzhou\r\n"
         << "X-TC-Timestamp: " << timestamp << "\r\n"
         << "Authorization: " << auth << "\r\n"
         << "Content-Length: " << body.length() << "\r\n"
@@ -138,7 +146,7 @@ public:
 
         // 准备请求
         std::string content = base64Encode(username);
-        std::string body = "{\"Content\":\"" + content + "\"}";
+        std::string body = "{\"Content\":\"" + content + "\",\"BizType\":\"TencentCloudDefault\"}";
 
         // TC3-HMAC-SHA256 签名
         std::string host    = "tms.tencentcloudapi.com";
@@ -163,9 +171,8 @@ public:
         std::string canonicalQuery = "";
         std::string canonicalHeaders =
             "content-type:application/json\n"
-            "host:" + host + "\n"
-            "x-tc-action:" + action + "\n";
-        std::string signedHeaders = "content-type;host;x-tc-action";
+            "host:" + host + "\n";
+        std::string signedHeaders = "content-type;host";
         std::string hashedPayload = sha256Hex(body);
 
         std::ostringstream canonicalReq;
@@ -187,10 +194,11 @@ public:
                   << hashedCanonical;
 
         // 3. Signature
-        std::string secretDate    = hmacSha256Hex("TC3" + secretKey, date);
-        std::string secretService = hmacSha256Hex(secretDate, service);
-        std::string secretSigning = hmacSha256Hex(secretService, "tc3_request");
+        std::string secretDate    = hmacSha256Bin("TC3" + secretKey, date);
+        std::string secretService = hmacSha256Bin(secretDate, service);
+        std::string secretSigning = hmacSha256Bin(secretService, "tc3_request");
         std::string signature     = hmacSha256Hex(secretSigning, strToSign.str());
+
 
         // 4. Authorization header
         std::ostringstream auth;
