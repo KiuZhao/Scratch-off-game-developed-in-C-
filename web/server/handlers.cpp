@@ -3,6 +3,7 @@
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
 #include <nlohmann/json.hpp>
+#include "tms_client.h"
 #include <sstream>
 #include <cmath>
 #include <ctime>
@@ -127,6 +128,10 @@ HttpResponse Router::handleRegister(const HttpRequest& req, MySQLConn* db) {
         std::string filterReason;
         if(!NameFilter::instance().check(u, filterReason))
             return HttpResponse::badRequest().json(("{\"error\":\""+filterReason+"\"}").c_str());
+        // 腾讯云 TMS 审核
+        auto tmsResult = TmsClient::checkUsername(u);
+        if(!tmsResult.ok || tmsResult.blocked)
+            return HttpResponse::badRequest().json("{\"error\":\"用户名含不当内容，请更换\"}");
         auto rows=db->query("SELECT id FROM users WHERE username='%s'",db->escape(u).c_str());
         if(!rows.empty())return HttpResponse().status(409,"Conflict").json("{\"error\":\"username taken\"}");
         uint8_t h[SHA256_DIGEST_LENGTH]; SHA256((const uint8_t*)p.c_str(),p.length(),h);
