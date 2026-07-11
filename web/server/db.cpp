@@ -10,7 +10,9 @@
 // =====================================================================
 
 bool MySQLConn::connect() {
-    if (!m_conn) m_conn = mysql_init(nullptr);
+    // 如果是重连，先关闭旧连接
+    if (m_conn) { mysql_close(m_conn); m_conn = nullptr; }
+    m_conn = mysql_init(nullptr);
     if (!mysql_real_connect(m_conn, MYSQL_HOST, MYSQL_USER, MYSQL_PASS,
                              MYSQL_DB, MYSQL_PORT, nullptr, 0)) {
         fprintf(stderr, "MySQL connect: %s\n", mysql_error(m_conn));
@@ -21,6 +23,7 @@ bool MySQLConn::connect() {
 }
 
 bool MySQLConn::ping() {
+    if (!m_conn) return 1;
     return mysql_ping(m_conn) == 0;
 }
 
