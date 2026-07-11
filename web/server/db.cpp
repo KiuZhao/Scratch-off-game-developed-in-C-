@@ -100,6 +100,11 @@ MySQLConn* MySQLPool::acquire() {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_cv.wait(lock, [this]{ return !m_pool.empty(); });
     auto* conn = m_pool.front(); m_pool.pop();
+    // 空闲超时断开后自动重连
+    if (conn->ping() != 0) {
+        fprintf(stderr, "MySQL reconnect...\n");
+        conn->connect();
+    }
     return conn;
 }
 
